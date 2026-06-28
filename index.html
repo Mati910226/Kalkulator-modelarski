@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1f2933">
+<title>Kalkulator modelarski</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: #1f2933;
+    color: #f3f4f6;
+}
+
+.app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 460px 1fr 460px;
+    gap: 24px;
+    padding: 24px;
+}
+
+.panel {
+    background: #2d3748;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+}
+
+h1, h2 { margin-top: 0; }
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.tab { background: #4b5563; color: white; }
+.tab.active { background: #2563eb; }
+
+.mode { display: none; }
+.mode.active { display: block; }
+
+label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #cbd5e1;
+}
+
+input {
+    width: 100%;
+    padding: 17px;
+    font-size: 25px;
+    border-radius: 12px;
+    border: 2px solid #4b5563;
+    background: #111827;
+    color: white;
+    outline: none;
+}
+
+input:focus { border-color: #60a5fa; }
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+    flex-wrap: wrap;
+}
+
+.primary { background: #2563eb; color: white; }
+.secondary { background: #4b5563; color: white; }
+.copy { background: #16a34a; color: white; }
+.danger { background: #991b1b; color: white; }
+
+.result-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.result-label {
+    color: #9ca3af;
+    font-size: 18px;
+    margin-bottom: 14px;
+}
+
+.result-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.result {
+    flex: 1;
+    background: #111827;
+    border-radius: 18px;
+    padding: 32px;
+    font-size: 56px;
+    font-weight: bold;
+    min-height: 130px;
+    display: flex;
+    align-items: center;
+    word-break: break-all;
+}
+
+.unit { color: #9ca3af; margin-left: 8px; }
+
+.formula {
+    margin-top: 32px;
+    background: #111827;
+    color: #cbd5e1;
+    padding: 18px;
+    border-radius: 12px;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.message {
+    margin-top: 18px;
+    min-height: 24px;
+    color: #f87171;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(100vh - 190px);
+    overflow-y: auto;
+}
+
+.history-item {
+    background: #111827;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #374151;
+}
+
+.history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.history-angle {
+    font-size: 22px;
+    font-weight: bold;
+    color: #93c5fd;
+}
+
+.history-data {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+
+.history-copy {
+    background: #16a34a;
+    color: white;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+.small-note {
+    margin-top: 20px;
+    color: #9ca3af;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+@media (max-width: 1300px) {
+    .app { grid-template-columns: 1fr; }
+    .result { font-size: 38px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <section class="panel">
+        <h1>Kalkulator modelarski</h1>
+
+        <div class="tabs">
+            <button id="tab1" class="tab active" onclick="zmienTryb(1)">Tryb 1 — Arcus TG</button>
+            <button id="tab2" class="tab" onclick="zmienTryb(2)">Tryb 2 — Kąt β</button>
+        </div>
+
+        <div id="mode1" class="mode active">
+            <h2>Arcus TG</h2>
+
+            <label for="a1">A [mm]</label>
+            <input id="a1" type="text" inputmode="decimal" placeholder="np. 12,34567890">
+
+            <label for="b1">B [mm]</label>
+            <input id="b1" type="text" inputmode="decimal" placeholder="np. 50,00000000">
+        </div>
+
+        <div id="mode2" class="mode">
+            <h2>Kąt β</h2>
+
+            <label for="a2">Wysokość A [mm]</label>
+            <input id="a2" type="text" inputmode="decimal" placeholder="np. 100">
+
+            <label for="alfa2">Kąt α [°]</label>
+            <input id="alfa2" type="text" inputmode="decimal" placeholder="np. 2">
+
+            <label for="b2">Wysokość B [mm]</label>
+            <input id="b2" type="text" inputmode="decimal" placeholder="np. 50">
+        </div>
+
+        <div class="buttons">
+            <button class="primary" onclick="oblicz()">Oblicz</button>
+            <button class="secondary" onclick="wyczysc()">Wyczyść</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="small-note">
+            Enter = oblicz<br>
+            Escape = wyczyść<br>
+            Wynik kopiuje się bez znaku °<br>
+            Historia zapisuje ostatnie 20 obliczeń.
+        </div>
+    </section>
+
+    <section class="panel result-panel">
+        <div class="result-label">Wynik</div>
+
+        <div class="result-row">
+            <div class="result">
+                <span id="wynik">—</span>
+                <span class="unit">°</span>
+            </div>
+
+            <button class="copy" onclick="kopiuj()">Kopiuj</button>
+        </div>
+
+        <div id="formula" class="formula">
+            kąt = atan(A / B) × 180 / π
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Historia</h2>
+
+        <div class="buttons" style="margin-top:0; margin-bottom:18px;">
+            <button class="danger" onclick="wyczyscHistorie()">Wyczyść historię</button>
+        </div>
+
+        <div id="history" class="history-list"></div>
+    </section>
+
+</div>
+
+<script>
+let tryb = 1;
+let aktualnyWynik = "";
+let historia = JSON.parse(localStorage.getItem("historiaKalkulatorModelarski")) || [];
+
+function parseNumber(value) {
+    return parseFloat(value.replace(",", "."));
+}
+
+function degToRad(deg) {
+    return deg * Math.PI / 180;
+}
+
+function radToDeg(rad) {
+    return rad * 180 / Math.PI;
+}
+
+function pokazKomunikat(tresc, kolor = "#f87171") {
+    const message = document.getElementById("message");
+    message.style.color = kolor;
+    message.textContent = tresc;
+}
+
+function zmienTryb(nowyTryb) {
+    tryb = nowyTryb;
+
+    document.getElementById("tab1").classList.toggle("active", tryb === 1);
+    document.getElementById("tab2").classList.toggle("active", tryb === 2);
+
+    document.getElementById("mode1").classList.toggle("active", tryb === 1);
+    document.getElementById("mode2").classList.toggle("active", tryb === 2);
+
+    document.getElementById("wynik").textContent = "—";
+    aktualnyWynik = "";
+    pokazKomunikat("");
+
+    if (tryb === 1) {
+        document.getElementById("formula").innerHTML = "kąt = atan(A / B) × 180 / π";
+        document.getElementById("a1").focus();
+    } else {
+        document.getElementById("formula").innerHTML =
+            "przesunięcie = A × tan(α)<br>β = atan(przesunięcie / B)<br><br>β = atan((A × tan(α)) / B)";
+        document.getElementById("a2").focus();
+    }
+}
+
+function oblicz() {
+    if (tryb === 1) {
+        obliczTryb1();
+    } else {
+        obliczTryb2();
+    }
+}
+
+function obliczTryb1() {
+    const Atext = document.getElementById("a1").value;
+    const Btext = document.getElementById("b1").value;
+
+    const A = parseNumber(Atext);
+    const B = parseNumber(Btext);
+
+    if (isNaN(A) || isNaN(B)) {
+        pokazBlad("Podaj poprawne wartości A i B.");
+        return;
+    }
+
+    if (B === 0) {
+        pokazBlad("B nie może być równe 0.");
+        return;
+    }
+
+    const kat = radToDeg(Math.atan(A / B));
+    aktualnyWynik = kat.toFixed(8);
+
+    pokazWynik();
+
+    dodajDoHistorii({
+        tryb: "Arcus TG",
+        wynik: aktualnyWynik,
+        dane: `A: ${Atext} mm<br>B: ${Btext} mm`
+    });
+
+    kopiuj();
+}
+
+function obliczTryb2() {
+    const Atext = document.getElementById("a2").value;
+    const AlfaText = document.getElementById("alfa2").value;
+    const Btext = document.getElementById("b2").value;
+
+    const A = parseNumber(Atext);
+    const alfa = parseNumber(AlfaText);
+    const B = parseNumber(Btext);
+
+    if (isNaN(A) || isNaN(alfa) || isNaN(B)) {
+        pokazBlad("Podaj poprawne wartości A, α i B.");
+        return;
+    }
+
+    if (B === 0) {
+        pokazBlad("B nie może być równe 0.");
+        return;
+    }
+
+    const przesuniecie = A * Math.tan(degToRad(alfa));
+    const beta = radToDeg(Math.atan(przesuniecie / B));
+
+    aktualnyWynik = beta.toFixed(8);
+
+    pokazWynik();
+
+    dodajDoHistorii({
+        tryb: "Kąt β",
+        wynik: aktualnyWynik,
+        dane: `A: ${Atext} mm<br>α: ${AlfaText}°<br>B: ${Btext} mm`
+    });
+
+    kopiuj();
+}
+
+function pokazBlad(tresc) {
+    aktualnyWynik = "";
+    document.getElementById("wynik").textContent = "—";
+    pokazKomunikat(tresc);
+}
+
+function pokazWynik() {
+    document.getElementById("wynik").textContent = aktualnyWynik;
+    pokazKomunikat("Wynik obliczony i skopiowany.", "#4ade80");
+}
+
+function kopiuj() {
+    if (!aktualnyWynik) {
+        pokazKomunikat("Najpierw oblicz wynik.");
+        return;
+    }
+
+    kopiujTekst(aktualnyWynik);
+}
+
+function kopiujTekst(tekst) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(tekst)
+            .then(() => pokazKomunikat("Wynik skopiowany.", "#4ade80"))
+            .catch(() => kopiujAwaryjnie(tekst));
+    } else {
+        kopiujAwaryjnie(tekst);
+    }
+}
+
+function kopiujAwaryjnie(tekst) {
+    const pole = document.createElement("textarea");
+    pole.value = tekst;
+    pole.style.position = "fixed";
+    pole.style.left = "-9999px";
+
+    document.body.appendChild(pole);
+    pole.focus();
+    pole.select();
+
+    try {
+        document.execCommand("copy");
+        pokazKomunikat("Wynik skopiowany.", "#4ade80");
+    } catch {
+        pokazKomunikat("Nie udało się skopiować. Zaznacz wynik ręcznie.");
+    }
+
+    document.body.removeChild(pole);
+}
+
+function wyczysc() {
+    if (tryb === 1) {
+        document.getElementById("a1").value = "";
+        document.getElementById("b1").value = "";
+        document.getElementById("a1").focus();
+    } else {
+        document.getElementById("a2").value = "";
+        document.getElementById("alfa2").value = "";
+        document.getElementById("b2").value = "";
+        document.getElementById("a2").focus();
+    }
+
+    document.getElementById("wynik").textContent = "—";
+    aktualnyWynik = "";
+    pokazKomunikat("");
+}
+
+function dodajDoHistorii(wpis) {
+    const teraz = new Date();
+
+    wpis.czas = teraz.toLocaleTimeString("pl-PL", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    historia.unshift(wpis);
+    historia = historia.slice(0, 20);
+
+    localStorage.setItem("historiaKalkulatorModelarski", JSON.stringify(historia));
+    renderHistoria();
+}
+
+function renderHistoria() {
+    const box = document.getElementById("history");
+    box.innerHTML = "";
+
+    if (historia.length === 0) {
+        box.innerHTML = "<div class='small-note'>Brak historii.</div>";
+        return;
+    }
+
+    historia.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        div.innerHTML = `
+            <div class="history-top">
+                <div>
+                    <div class="history-angle">${item.wynik}°</div>
+                    <div class="history-data">
+                        ${item.czas} — ${item.tryb}<br>
+                        ${item.dane}
+                    </div>
+                </div>
+                <button class="history-copy" onclick="kopiujZHistorii(${index})">Kopiuj</button>
+            </div>
+        `;
+
+        box.appendChild(div);
+    });
+}
+
+function kopiujZHistorii(index) {
+    aktualnyWynik = historia[index].wynik;
+    document.getElementById("wynik").textContent = aktualnyWynik;
+    kopiujTekst(aktualnyWynik);
+}
+
+function wyczyscHistorie() {
+    historia = [];
+    localStorage.removeItem("historiaKalkulatorModelarski");
+    renderHistoria();
+}
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        oblicz();
+    }
+
+    if (e.key === "Escape") {
+        wyczysc();
+    }
+});
+
+document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("focus", function() {
+        this.select();
+    });
+});
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js");
+    });
+}
+
+renderHistoria();
+</script>
+
+</body>
+</html>
