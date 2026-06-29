@@ -4,26 +4,190 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalkulator modelarski</title>
-<style>
-:root{--bg:#151b24;--panel:#242d3a;--panel2:#111827;--line:#3b4658;--text:#f3f4f6;--muted:#9ca3af;--blue:#2563eb;--blue2:#60a5fa;--green:#16a34a;--red:#991b1b}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}.app{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}.topbar{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:#0f1722;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800}.brand-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--blue)}.version{color:var(--muted);font-size:14px}.workspace{min-height:0;display:grid;grid-template-columns:320px minmax(520px,1fr)}.sidebar{background:#192231;border-right:1px solid var(--line);padding:18px}.section-title{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:18px 0 8px}.nav-btn{width:100%;border:1px solid transparent;border-radius:14px;background:transparent;color:var(--text);padding:14px;margin-bottom:8px;font-size:16px;font-weight:700;text-align:left;cursor:pointer;display:flex;gap:10px}.nav-btn:hover{background:rgba(255,255,255,.05);border-color:var(--line)}.nav-btn.active{background:var(--blue);border-color:var(--blue2)}.main{min-width:0;padding:22px;display:grid;grid-template-columns:420px minmax(520px,1fr);gap:22px}.panel{background:var(--panel);border:1px solid #303949;border-radius:18px;padding:24px;box-shadow:0 14px 34px rgba(0,0,0,.35)}.result-panel{display:flex;flex-direction:column;justify-content:center}.mode{display:none}.mode.active{display:block;animation:fadeIn .13s ease-out}@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}h1,h2,p{margin-top:0}h2{font-size:26px;margin-bottom:6px}.mode-desc{color:var(--muted);margin-bottom:22px;line-height:1.4}label{display:block;margin-top:18px;margin-bottom:8px;font-weight:bold;color:#cbd5e1}input{width:100%;padding:16px;font-size:24px;border-radius:12px;border:2px solid #4b5563;background:var(--panel2);color:#fff;outline:none}input:focus{border-color:var(--blue2)}button{border:none;border-radius:12px;padding:13px 16px;font-size:15px;font-weight:bold;cursor:pointer}.buttons{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}.primary{background:var(--blue);color:#fff}.secondary{background:#4b5563;color:#fff}.copy{background:var(--green);color:#fff}.danger{background:var(--red);color:#fff}.ghost{background:#1f2937;color:#fff;border:1px solid var(--line)}.result-label{color:var(--muted);font-size:18px;margin-bottom:14px}.result{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:32px;font-size:clamp(42px,5.1vw,76px);font-weight:900;min-height:150px;display:flex;align-items:center;white-space:nowrap;overflow-x:auto}.unit{color:var(--muted);margin-left:10px}.details{margin-top:24px;background:var(--panel2);color:#cbd5e1;padding:18px;border-radius:12px;font-size:17px;line-height:1.6;border:1px solid #303949}.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.choice-btn{background:var(--panel2);color:#fff;border:2px solid #4b5563}.choice-btn.active{background:var(--blue);border-color:var(--blue2)}.statusbar{min-height:38px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 22px;background:#0f1722;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.status-msg{color:#cbd5e1}.shortcuts{display:flex;gap:14px;flex-wrap:wrap}kbd{background:#111827;border:1px solid #374151;border-bottom-color:#4b5563;padding:2px 6px;border-radius:6px;color:#fff;font-size:12px}.drawer{position:fixed;top:66px;right:0;bottom:38px;width:390px;background:#192231;border-left:1px solid var(--line);box-shadow:-18px 0 40px rgba(0,0,0,.38);transform:translateX(102%);transition:transform .18s ease-out;z-index:20;display:flex;flex-direction:column}.drawer.open{transform:translateX(0)}.drawer-header{padding:18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.drawer-header h2{margin:0;font-size:22px}.history-list{padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}.history-item{background:var(--panel2);border-radius:12px;padding:12px;border:1px solid #374151}.history-result{font-size:20px;font-weight:bold;color:#93c5fd}.history-data{margin-top:8px;font-size:13px;color:var(--muted);line-height:1.45}.history-buttons{display:flex;gap:8px;margin-top:12px}.history-buttons button{padding:9px 11px;font-size:13px}.toast{position:fixed;left:50%;bottom:54px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#101827;border:1px solid var(--line);color:white;padding:12px 16px;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.35);transition:opacity .14s ease-out,transform .14s ease-out;z-index:30}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.small-note{margin-top:18px;color:var(--muted);font-size:14px;line-height:1.5}@media(max-width:1150px){.workspace{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid var(--line)}.main{grid-template-columns:1fr}.drawer{width:min(420px,92vw)}}
-</style>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <div class="app">
-<header class="topbar"><div class="brand"><div class="brand-icon">📐</div><div>Kalkulator modelarski</div><div class="version">v1.0 demo</div></div><button class="ghost" onclick="toggleHistoria()">☰ Historia</button></header>
-<div class="workspace"><aside class="sidebar"><div class="section-title">Geometria</div><button class="nav-btn active" onclick="zmienTryb(1)">📐 Arcus TG</button><button class="nav-btn" onclick="zmienTryb(2)">📏 Kąt β</button><div class="section-title">Model odlewniczy</div><button class="nav-btn" onclick="zmienTryb(3)">📦 Skurcz</button><button class="nav-btn" onclick="zmienTryb(4)">🔩 Luzy znaków rdzeniowych</button><button class="nav-btn" onclick="zmienTryb(5)">🗑️ Tworzenie śmietników</button><div class="small-note">Obsługa pod SolidWorksa:<br>wynik kopiuje się bez jednostki.</div></aside>
-<main class="main"><section class="panel input-panel">
-<div id="mode1" class="mode active"><h2>Arcus TG</h2><p class="mode-desc">Szybkie wyliczanie kąta roboczego.</p><label>A [mm]</label><input id="a1" type="text" inputmode="decimal" placeholder="np. 12,34567890"><label>B [mm]</label><input id="b1" type="text" inputmode="decimal" placeholder="np. 50"></div>
-<div id="mode2" class="mode"><h2>Kąt β</h2><p class="mode-desc">Wyliczanie kąta pomocniczego z podanych wymiarów.</p><label>Wysokość A [mm]</label><input id="a2" type="text" inputmode="decimal" placeholder="np. 100"><label>Kąt α [°]</label><input id="alfa2" type="text" inputmode="decimal" placeholder="np. 2"><label>Wysokość B [mm]</label><input id="b2" type="text" inputmode="decimal" placeholder="np. 50"></div>
-<div id="mode3" class="mode"><h2>Skurcz</h2><p class="mode-desc">Powiększanie albo przeliczanie wymiaru modelowego.</p><label>Wymiar [mm]</label><input id="w3" type="text" inputmode="decimal" placeholder="np. 100"><label>Skurcz</label><div class="choice-grid"><button class="choice-btn" onclick="wybierzSkurcz(0.8,this)">0,8%</button><button class="choice-btn" onclick="wybierzSkurcz(1,this)">1%</button><button class="choice-btn" onclick="wybierzSkurcz(1.25,this)">1,25%</button><button class="choice-btn active" onclick="wybierzSkurcz(1.5,this)">1,5%</button><button class="choice-btn" onclick="wybierzSkurcz(2,this)">2%</button><button class="choice-btn" onclick="wybierzSkurcz(2.5,this)">2,5%</button></div><label>Inny skurcz [%]</label><input id="custom3" type="text" inputmode="decimal" placeholder="np. 1,73" oninput="wybierzInnySkurcz()"><label>Kierunek</label><div class="choice-grid" style="grid-template-columns:1fr 1fr;"><button id="pow3" class="choice-btn active" onclick="kierunek3='pow';updateChoice('pow3','pom3')">Powiększ</button><button id="pom3" class="choice-btn" onclick="kierunek3='pom';updateChoice('pom3','pow3')">Pomniejsz</button></div></div>
-<div id="mode4" class="mode"><h2>Luzy na znakach rdzeniowych</h2><p class="mode-desc">Przeliczanie równoważnego luzu dla dwóch pochyleń.</p><label>Kąt 1 [°]</label><input id="kat41" type="text" inputmode="decimal" placeholder="np. 10"><label>Kąt 2 [°]</label><input id="kat42" type="text" inputmode="decimal" placeholder="np. 5"><label>Luz 1 [mm]</label><input id="luz41" type="text" inputmode="decimal" placeholder="np. 1"></div>
-<div id="mode5" class="mode"><h2>Tworzenie śmietników</h2><p class="mode-desc">Wyliczanie szerokości podstawy dla zadanej geometrii.</p><label>Kąt pochylenia [°]</label><input id="kat5" type="text" inputmode="decimal" placeholder="np. 5"><label>Wysokość [mm]</label><input id="h5" type="text" inputmode="decimal" placeholder="np. 7"><label>Szerokość docelowa [mm]</label><input id="s5" type="text" inputmode="decimal" placeholder="np. 8"></div>
-<div class="buttons"><button class="primary" onclick="oblicz()">Oblicz</button><button class="secondary" onclick="wyczysc()">Wyczyść</button></div></section>
-<section class="panel result-panel"><div class="result-label">Wynik</div><div class="result"><span id="wynik">—</span><span id="unit" class="unit">°</span></div><div class="buttons"><button class="copy" onclick="kopiuj()">Kopiuj wynik</button></div><div id="details" class="details">Wybierz tryb i wpisz dane.</div></section></main></div>
-<footer class="statusbar"><div id="status" class="status-msg">Gotowy</div><div class="shortcuts"><span><kbd>Enter</kbd> Oblicz</span><span><kbd>Esc</kbd> Wyczyść</span><span><kbd>Ctrl</kbd>+<kbd>C</kbd> Kopiuj</span><span><kbd>F1-F5</kbd> Tryby</span></div></footer></div>
-<aside id="drawer" class="drawer"><div class="drawer-header"><h2>Historia</h2><div><button class="danger" onclick="wyczyscHistorie()">Wyczyść</button><button class="secondary" onclick="toggleHistoria()">Zamknij</button></div></div><div id="history" class="history-list"></div></aside><div id="toast" class="toast">Skopiowano</div>
-<script>
-let tryb=Number(localStorage.getItem('ostatniTrybKalkulatorModelarski'))||1,aktualnyWynik='',aktualnaJednostka='°',skurcz3=1.5,kierunek3='pow';let historia=JSON.parse(localStorage.getItem('historiaKalkulatorModelarskiV2'))||[];function n(v){return parseFloat(String(v).replace(',','.'))}function deg(v){return v*Math.PI/180}function rad(v){return v*180/Math.PI}function f8(v){return v.toFixed(8)}function setStatus(t){document.getElementById('status').textContent=t||'Gotowy'}let toastTimer;function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),1300)}function toggleHistoria(){document.getElementById('drawer').classList.toggle('open')}function zmienTryb(t){tryb=t;localStorage.setItem('ostatniTrybKalkulatorModelarski',String(t));document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i+1===t));document.querySelectorAll('.mode').forEach((m,i)=>m.classList.toggle('active',i+1===t));aktualnyWynik='';document.getElementById('wynik').textContent='—';setStatus('Zmieniono tryb.');updateOpis();const first=document.querySelector('.mode.active input');if(first)first.focus()}function updateOpis(){const d=document.getElementById('details'),u=document.getElementById('unit');if(tryb===1){u.textContent='°';d.innerHTML='Narzędzie gotowe do obliczeń.'}if(tryb===2){u.textContent='°';d.innerHTML='Narzędzie gotowe do obliczeń.'}if(tryb===3){u.textContent='mm';d.innerHTML='Narzędzie gotowe do obliczeń.'}if(tryb===4){u.textContent='mm';d.innerHTML='Narzędzie gotowe do obliczeń.'}if(tryb===5){u.textContent='mm';d.innerHTML='Narzędzie gotowe do obliczeń.'}}function oblicz(){if(tryb===1)calc1();if(tryb===2)calc2();if(tryb===3)calc3();if(tryb===4)calc4();if(tryb===5)calc5()}function setResult(wynik,jednostka,nazwa,dane,szczegoly){aktualnyWynik=f8(wynik);aktualnaJednostka=jednostka;document.getElementById('wynik').textContent=aktualnyWynik;document.getElementById('unit').textContent=jednostka;document.getElementById('details').innerHTML=szczegoly;historia.unshift({czas:new Date().toLocaleTimeString('pl-PL'),nazwa,wynik:aktualnyWynik,jednostka,dane});historia=historia.slice(0,20);saveHist();kopiuj();setStatus('Wynik obliczony.')}function blad(t){aktualnyWynik='';document.getElementById('wynik').textContent='—';setStatus(t);toast(t)}function calc1(){const A=n(a1.value),B=n(b1.value);if(isNaN(A)||isNaN(B))return blad('Podaj A i B.');if(B===0)return blad('B nie może być równe 0.');setResult(rad(Math.atan(A/B)),'°','Arcus TG',`A=${A} mm<br>B=${B} mm`,`Dane zapisane w historii.`)}function calc2(){const A=n(a2.value),alfa=n(alfa2.value),B=n(b2.value);if(isNaN(A)||isNaN(alfa)||isNaN(B))return blad('Podaj A, α i B.');if(B===0)return blad('B nie może być równe 0.');const przes=A*Math.tan(deg(alfa)),beta=rad(Math.atan(przes/B));setResult(beta,'°','Kąt β',`A=${A} mm<br>α=${alfa}°<br>B=${B} mm`,`przesunięcie = ${f8(przes)} mm<br>Dane zapisane w historii.`)}function wybierzSkurcz(v,btn){skurcz3=v;custom3.value='';document.querySelectorAll('#mode3 .choice-grid:first-of-type .choice-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}function wybierzInnySkurcz(){const v=n(custom3.value);if(!isNaN(v)){skurcz3=v;document.querySelectorAll('#mode3 .choice-grid:first-of-type .choice-btn').forEach(b=>b.classList.remove('active'))}}function updateChoice(a,i){document.getElementById(a).classList.add('active');document.getElementById(i).classList.remove('active')}function calc3(){const w=n(w3.value);if(isNaN(w))return blad('Podaj wymiar.');const mnoz=1+skurcz3/100,wynik=kierunek3==='pow'?w*mnoz:w/mnoz,rozn=wynik-w;setResult(wynik,'mm','Skurcz',`Wymiar=${w} mm<br>Skurcz=${skurcz3}%<br>Kierunek=${kierunek3==='pow'?'powiększ':'pomniejsz'}`,`Skurcz: ${skurcz3}%<br>Różnica: ${rozn>=0?'+':''}${f8(rozn)} mm`)}function calc4(){const k1=n(kat41.value),k2=n(kat42.value),l1=n(luz41.value);if(isNaN(k1)||isNaN(k2)||isNaN(l1))return blad('Podaj kąt 1, kąt 2 i luz.');const wynik=l1*Math.cos(deg(k2))/Math.cos(deg(k1));setResult(wynik,'mm','Luzy znaków rdzeniowych',`Kąt 1=${k1}°<br>Kąt 2=${k2}°<br>Luz 1=${l1} mm`,`Dane zapisane w historii.`)}function calc5(){const k=n(kat5.value),h=n(h5.value),s=n(s5.value);if(isNaN(k)||isNaN(h)||isNaN(s))return blad('Podaj kąt, wysokość i szerokość.');const przyrost=h*Math.tan(deg(k)),wynik=s+przyrost;setResult(wynik,'mm','Tworzenie śmietników',`Kąt=${k}°<br>Wysokość=${h} mm<br>Szerokość=${s} mm`,`Przyrost: ${f8(przyrost)} mm`)}function kopiuj(){if(!aktualnyWynik)return blad('Najpierw oblicz wynik.');kopiujTekst(aktualnyWynik)}function kopiujTekst(t){if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(()=>{setStatus('Skopiowano: '+t);toast('Skopiowano '+t)}).catch(()=>fallbackCopy(t))}else fallbackCopy(t)}function fallbackCopy(t){const area=document.createElement('textarea');area.value=t;area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.focus();area.select();try{document.execCommand('copy');setStatus('Skopiowano: '+t);toast('Skopiowano '+t)}catch{setStatus('Nie udało się skopiować.');toast('Nie udało się skopiować.')}document.body.removeChild(area)}function wyczysc(){document.querySelectorAll('.mode.active input').forEach(i=>i.value='');aktualnyWynik='';wynik.textContent='—';setStatus('Wyczyszczono.');const first=document.querySelector('.mode.active input');if(first)first.focus()}function saveHist(){localStorage.setItem('historiaKalkulatorModelarskiV2',JSON.stringify(historia));renderHist()}function renderHist(){const box=document.getElementById('history');box.innerHTML='';if(historia.length===0){box.innerHTML='<div class="small-note">Brak historii.</div>';return}historia.forEach((h,i)=>{const div=document.createElement('div');div.className='history-item';div.innerHTML=`<div class="history-result">${h.wynik} ${h.jednostka}</div><div class="history-data">${h.czas} — ${h.nazwa}<br>${h.dane}</div><div class="history-buttons"><button class="copy" onclick="kopiujHistorie(${i})">Kopiuj</button><button class="danger" onclick="usunHistorie(${i})">Usuń</button></div>`;box.appendChild(div)})}function kopiujHistorie(i){aktualnyWynik=historia[i].wynik;wynik.textContent=aktualnyWynik;unit.textContent=historia[i].jednostka;kopiujTekst(aktualnyWynik)}function usunHistorie(i){historia.splice(i,1);saveHist();setStatus('Wpis historii usunięty.');toast('Wpis usunięty')}function wyczyscHistorie(){historia=[];saveHist();setStatus('Historia wyczyszczona.');toast('Historia wyczyszczona')}document.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();oblicz()}if(e.key==='Escape'){e.preventDefault();wyczysc()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c'&&aktualnyWynik)kopiuj();if(e.key==='F1'){e.preventDefault();zmienTryb(1)}if(e.key==='F2'){e.preventDefault();zmienTryb(2)}if(e.key==='F3'){e.preventDefault();zmienTryb(3)}if(e.key==='F4'){e.preventDefault();zmienTryb(4)}if(e.key==='F5'){e.preventDefault();zmienTryb(5)}});document.querySelectorAll('input').forEach(i=>i.addEventListener('focus',function(){this.select()}));zmienTryb(tryb);renderHist();
-</script>
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">📐</div>
+        <div>Kalkulator modelarski</div>
+        <div class="version">v1.0</div>
+    </div>
+    <button class="ghost" onclick="toggleHistoria()">☰ Historia</button>
+</header>
+
+<div class="workspace">
+<aside class="sidebar">
+    <div class="section-title">Geometria</div>
+    <button class="nav-btn active" onclick="zmienTryb(1)">📐 Arcus TG</button>
+    <button class="nav-btn" onclick="zmienTryb(2)">📏 Kąt β</button>
+    <button class="nav-btn" onclick="zmienTryb(3)">📊 Nachylenie % ↔ °</button>
+
+    <div class="section-title">Model odlewniczy</div>
+    <button class="nav-btn" onclick="zmienTryb(4)">📦 Skurcz</button>
+    <button class="nav-btn" onclick="zmienTryb(5)">🔩 Luzy znaków rdzeniowych</button>
+    <button class="nav-btn" onclick="zmienTryb(6)">🗑️ Tworzenie śmietników</button>
+
+    <div class="small-note">
+        Wynik kopiuje się bez jednostki.<br>
+        Program działa też po zwykłym otwarciu pliku <b>index.html</b>.
+    </div>
+</aside>
+
+<main class="main">
+<section class="panel input-panel">
+
+<div id="mode1" class="mode active">
+    <h2>Arcus TG</h2>
+    <p class="mode-desc">Szybkie wyliczanie kąta roboczego.</p>
+    <label>A [mm]</label>
+    <input id="a1" type="text" inputmode="decimal" placeholder="np. 12,34567890">
+    <label>B [mm]</label>
+    <input id="b1" type="text" inputmode="decimal" placeholder="np. 50">
+</div>
+
+<div id="mode2" class="mode">
+    <h2>Kąt β</h2>
+    <p class="mode-desc">Wyliczanie kąta pomocniczego z podanych wymiarów.</p>
+    <label>Wysokość A [mm]</label>
+    <input id="a2" type="text" inputmode="decimal" placeholder="np. 100">
+    <label>Kąt α [°]</label>
+    <input id="alfa2" type="text" inputmode="decimal" placeholder="np. 2">
+    <label>Wysokość B [mm]</label>
+    <input id="b2" type="text" inputmode="decimal" placeholder="np. 50">
+</div>
+
+<div id="mode3" class="mode">
+    <h2>Nachylenie % ↔ °</h2>
+    <p class="mode-desc">Przeliczenia pochylenia w procentach, stopniach i milimetrach.</p>
+
+    <label>Rodzaj obliczenia</label>
+    <div class="choice-grid one-col">
+        <button id="n31" class="choice-btn active" onclick="ustawNachylenie(1)">mm → %</button>
+        <button id="n32" class="choice-btn" onclick="ustawNachylenie(2)">% → °</button>
+        <button id="n33" class="choice-btn" onclick="ustawNachylenie(3)">° → %</button>
+        <button id="n34" class="choice-btn" onclick="ustawNachylenie(4)">% + wysokość → przesunięcie</button>
+    </div>
+
+    <div id="nach1" class="submode active">
+        <label>A [mm]</label>
+        <input id="nA" type="text" inputmode="decimal" placeholder="np. 30">
+        <label>B [mm]</label>
+        <input id="nB" type="text" inputmode="decimal" placeholder="np. 50">
+    </div>
+
+    <div id="nach2" class="submode">
+        <label>Nachylenie [%]</label>
+        <input id="nProc" type="text" inputmode="decimal" placeholder="np. 60">
+    </div>
+
+    <div id="nach3" class="submode">
+        <label>Kąt [°]</label>
+        <input id="nKat" type="text" inputmode="decimal" placeholder="np. 30,96375653">
+    </div>
+
+    <div id="nach4" class="submode">
+        <label>Nachylenie [%]</label>
+        <input id="nProc2" type="text" inputmode="decimal" placeholder="np. 2">
+        <label>Wysokość [mm]</label>
+        <input id="nWys" type="text" inputmode="decimal" placeholder="np. 150">
+    </div>
+</div>
+
+<div id="mode4" class="mode">
+    <h2>Skurcz</h2>
+    <p class="mode-desc">Powiększanie albo przeliczanie wymiaru modelowego.</p>
+    <label>Wymiar [mm]</label>
+    <input id="w4" type="text" inputmode="decimal" placeholder="np. 100">
+    <label>Skurcz</label>
+    <div class="choice-grid">
+        <button class="choice-btn" onclick="wybierzSkurcz(0.8,this)">0,8%</button>
+        <button class="choice-btn" onclick="wybierzSkurcz(1,this)">1%</button>
+        <button class="choice-btn" onclick="wybierzSkurcz(1.25,this)">1,25%</button>
+        <button class="choice-btn active" onclick="wybierzSkurcz(1.5,this)">1,5%</button>
+        <button class="choice-btn" onclick="wybierzSkurcz(2,this)">2%</button>
+        <button class="choice-btn" onclick="wybierzSkurcz(2.5,this)">2,5%</button>
+    </div>
+    <label>Inny skurcz [%]</label>
+    <input id="custom4" type="text" inputmode="decimal" placeholder="np. 1,73" oninput="wybierzInnySkurcz()">
+    <label>Kierunek</label>
+    <div class="choice-grid two-col">
+        <button id="pow4" class="choice-btn active" onclick="kierunek4='pow'; updateChoice('pow4','pom4')">Powiększ</button>
+        <button id="pom4" class="choice-btn" onclick="kierunek4='pom'; updateChoice('pom4','pow4')">Pomniejsz</button>
+    </div>
+</div>
+
+<div id="mode5" class="mode">
+    <h2>Luzy na znakach rdzeniowych</h2>
+    <p class="mode-desc">Przeliczanie równoważnego luzu dla dwóch pochyleń.</p>
+    <label>Kąt 1 [°]</label>
+    <input id="kat51" type="text" inputmode="decimal" placeholder="np. 10">
+    <label>Kąt 2 [°]</label>
+    <input id="kat52" type="text" inputmode="decimal" placeholder="np. 5">
+    <label>Luz 1 [mm]</label>
+    <input id="luz51" type="text" inputmode="decimal" placeholder="np. 1">
+</div>
+
+<div id="mode6" class="mode">
+    <h2>Tworzenie śmietników</h2>
+    <p class="mode-desc">Wyliczanie szerokości podstawy dla zadanej geometrii.</p>
+    <label>Kąt pochylenia [°]</label>
+    <input id="kat6" type="text" inputmode="decimal" placeholder="np. 5">
+    <label>Wysokość [mm]</label>
+    <input id="h6" type="text" inputmode="decimal" placeholder="np. 7">
+    <label>Szerokość docelowa [mm]</label>
+    <input id="s6" type="text" inputmode="decimal" placeholder="np. 8">
+</div>
+
+<div class="buttons">
+    <button class="primary" onclick="oblicz()">Oblicz</button>
+    <button class="secondary" onclick="wyczysc()">Wyczyść</button>
+</div>
+</section>
+
+<section class="panel result-panel">
+    <div class="result-label">Wynik</div>
+    <div class="result">
+        <span id="wynik">—</span>
+        <span id="unit" class="unit">°</span>
+    </div>
+    <div class="buttons">
+        <button class="copy" onclick="kopiuj()">Kopiuj wynik</button>
+    </div>
+    <div id="details" class="details">Wybierz narzędzie i wpisz dane wejściowe.</div>
+</section>
+</main>
+</div>
+
+<footer class="statusbar">
+    <div id="status" class="status-msg">Gotowy</div>
+    <div class="shortcuts">
+        <span><kbd>Enter</kbd> Oblicz</span>
+        <span><kbd>Esc</kbd> Wyczyść</span>
+        <span><kbd>Ctrl</kbd> + <kbd>C</kbd> Kopiuj</span>
+        <span><kbd>F1-F6</kbd> Tryby</span>
+    </div>
+</footer>
+</div>
+
+<aside id="drawer" class="drawer">
+    <div class="drawer-header">
+        <h2>Historia</h2>
+        <div>
+            <button class="danger" onclick="wyczyscHistorie()">Wyczyść</button>
+            <button class="secondary" onclick="toggleHistoria()">Zamknij</button>
+        </div>
+    </div>
+    <div id="history" class="history-list"></div>
+</aside>
+
+<div id="toast" class="toast">Skopiowano</div>
+
+<script src="script.js"></script>
 </body>
 </html>
