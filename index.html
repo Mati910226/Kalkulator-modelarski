@@ -12,59 +12,71 @@
 <body>
 
 <div class="app">
+
 <header class="topbar">
     <div class="brand">
-        <div class="brand-icon">📐</div>
+        <img class="brand-logo" src="icons/icon-192.png" alt="">
         <div>Kalkulator modelarski</div>
-        <div class="version">v1.0</div>
+        <div class="version">v1.1</div>
     </div>
-    <button class="ghost" onclick="toggleHistoria()">☰ Historia</button>
+
+    <div class="top-actions">
+        <button class="ghost" onclick="toggleUstawienia()">⚙ Ustawienia</button>
+        <button class="ghost" onclick="toggleHistoria()">☰ Historia</button>
+    </div>
 </header>
 
 <div class="workspace">
+
 <aside class="sidebar">
     <div class="section-title">Geometria</div>
-    <button class="nav-btn active" onclick="zmienTryb(1)">📐 Arcus TG</button>
-    <button class="nav-btn" onclick="zmienTryb(2)">📏 Kąt β</button>
-    <button class="nav-btn" onclick="zmienTryb(3)">📊 Nachylenie % ↔ °</button>
+    <button class="nav-btn active" onclick="zmienTryb(1)">📐 Wyliczanie kąta</button>
+    <button class="nav-btn" onclick="zmienTryb(2)">📏 Wyliczanie kąta β</button>
+    <button class="nav-btn" onclick="zmienTryb(3)">📊 Przelicznik nachylenia</button>
 
     <div class="section-title">Model odlewniczy</div>
-    <button class="nav-btn" onclick="zmienTryb(4)">📦 Skurcz</button>
+    <button class="nav-btn" onclick="zmienTryb(4)">📦 Kalkulator skurczu</button>
     <button class="nav-btn" onclick="zmienTryb(5)">🔩 Luzy znaków rdzeniowych</button>
     <button class="nav-btn" onclick="zmienTryb(6)">🗑️ Tworzenie śmietników</button>
 
     <div class="small-note">
         Wynik kopiuje się bez jednostki.<br>
-        Program działa też po zwykłym otwarciu pliku <b>index.html</b>.
+        Format wyniku jest zgodny z SolidWorksem.
     </div>
 </aside>
 
 <main class="main">
+
 <section class="panel input-panel">
 
 <div id="mode1" class="mode active">
-    <h2>Arcus TG</h2>
-    <p class="mode-desc">Szybkie wyliczanie pochylenia odlewniczego.</p>
+    <h2>Wyliczanie kąta</h2>
+    <p class="mode-desc">Szybkie wyliczanie kąta z wysokości i pochylenia w mm.</p>
+
     <label>A [mm]</label>
-    <input id="a1" type="text" inputmode="decimal" placeholder="np. 12,34567890">
+    <input id="a1" type="text" inputmode="decimal" placeholder="np. 12.34567890">
+
     <label>B [mm]</label>
-    <input id="b1" type="text" inputmode="decimal" placeholder="np. 50">
+    <input id="b1" type="text" inputmode="decimal" placeholder="np. 87.65432109">
 </div>
 
 <div id="mode2" class="mode">
-    <h2>Kąt β</h2>
-    <p class="mode-desc">Wyliczanie kąta pochylenia z dwóch różnych wysokości i kąta.</p>
+    <h2>Wyliczanie kąta β</h2>
+    <p class="mode-desc">Wyliczanie kąta β z podanych wysokości A, B i kąta α.</p>
+
     <label>Wysokość A [mm]</label>
-    <input id="a2" type="text" inputmode="decimal" placeholder="np. 100">
+    <input id="a2" type="text" inputmode="decimal" placeholder="np. 100.00000000">
+
     <label>Kąt α [°]</label>
-    <input id="alfa2" type="text" inputmode="decimal" placeholder="np. 2">
+    <input id="alfa2" type="text" inputmode="decimal" placeholder="np. 2.50000000">
+
     <label>Wysokość B [mm]</label>
-    <input id="b2" type="text" inputmode="decimal" placeholder="np. 50">
+    <input id="b2" type="text" inputmode="decimal" placeholder="np. 50.00000000">
 </div>
 
 <div id="mode3" class="mode">
-    <h2>Nachylenie % ↔ °</h2>
-    <p class="mode-desc">Przeliczenia pochylenia w procentach, stopniach i milimetrach.</p>
+    <h2>Przelicznik nachylenia</h2>
+    <p class="mode-desc">Przeliczanie pochylenia w procentach, stopniach i milimetrach.</p>
 
     <label>Rodzaj obliczenia</label>
     <div class="choice-grid one-col">
@@ -76,45 +88,51 @@
 
     <div id="nach1" class="submode active">
         <label>A [mm]</label>
-        <input id="nA" type="text" inputmode="decimal" placeholder="np. 30">
+        <input id="nA" type="text" inputmode="decimal" placeholder="np. 30.00000000">
+
         <label>B [mm]</label>
-        <input id="nB" type="text" inputmode="decimal" placeholder="np. 50">
+        <input id="nB" type="text" inputmode="decimal" placeholder="np. 50.00000000">
     </div>
 
     <div id="nach2" class="submode">
         <label>Nachylenie [%]</label>
-        <input id="nProc" type="text" inputmode="decimal" placeholder="np. 60">
+        <input id="nProc" type="text" inputmode="decimal" placeholder="np. 60.00000000">
     </div>
 
     <div id="nach3" class="submode">
         <label>Kąt [°]</label>
-        <input id="nKat" type="text" inputmode="decimal" placeholder="np. 30,96375653">
+        <input id="nKat" type="text" inputmode="decimal" placeholder="np. 30.96375653">
     </div>
 
     <div id="nach4" class="submode">
         <label>Nachylenie [%]</label>
-        <input id="nProc2" type="text" inputmode="decimal" placeholder="np. 2">
+        <input id="nProc2" type="text" inputmode="decimal" placeholder="np. 2.00000000">
+
         <label>Wysokość [mm]</label>
-        <input id="nWys" type="text" inputmode="decimal" placeholder="np. 150">
+        <input id="nWys" type="text" inputmode="decimal" placeholder="np. 150.00000000">
     </div>
 </div>
 
 <div id="mode4" class="mode">
-    <h2>Skurcz</h2>
-    <p class="mode-desc">Powiększanie albo pomniejszanie o skurcz.</p>
+    <h2>Kalkulator skurczu</h2>
+    <p class="mode-desc">Powiększanie lub pomniejszanie o skurcz.</p>
+
     <label>Wymiar [mm]</label>
-    <input id="w4" type="text" inputmode="decimal" placeholder="np. 100">
+    <input id="w4" type="text" inputmode="decimal" placeholder="np. 100.00000000">
+
     <label>Skurcz</label>
     <div class="choice-grid">
-        <button class="choice-btn" onclick="wybierzSkurcz(0.8,this)">0,8%</button>
+        <button class="choice-btn" onclick="wybierzSkurcz(0.8,this)">0.8%</button>
         <button class="choice-btn" onclick="wybierzSkurcz(1,this)">1%</button>
-        <button class="choice-btn" onclick="wybierzSkurcz(1.25,this)">1,25%</button>
-        <button class="choice-btn active" onclick="wybierzSkurcz(1.5,this)">1,5%</button>
+        <button class="choice-btn" onclick="wybierzSkurcz(1.25,this)">1.25%</button>
+        <button class="choice-btn active" onclick="wybierzSkurcz(1.5,this)">1.5%</button>
         <button class="choice-btn" onclick="wybierzSkurcz(2,this)">2%</button>
-        <button class="choice-btn" onclick="wybierzSkurcz(2.5,this)">2,5%</button>
+        <button class="choice-btn" onclick="wybierzSkurcz(2.5,this)">2.5%</button>
     </div>
+
     <label>Inny skurcz [%]</label>
-    <input id="custom4" type="text" inputmode="decimal" placeholder="np. 1,73" oninput="wybierzInnySkurcz()">
+    <input id="custom4" type="text" inputmode="decimal" placeholder="np. 1.73000000" oninput="wybierzInnySkurcz()">
+
     <label>Kierunek</label>
     <div class="choice-grid two-col">
         <button id="pow4" class="choice-btn active" onclick="kierunek4='pow'; updateChoice('pow4','pom4')">Powiększ</button>
@@ -123,49 +141,63 @@
 </div>
 
 <div id="mode5" class="mode">
-    <h2>Luzy na znakach rdzeniowych</h2>
+    <h2>Luzy znaków rdzeniowych</h2>
     <p class="mode-desc">Przeliczanie równoważnego luzu dla dwóch pochyleń.</p>
+
     <label>Kąt 1 [°]</label>
-    <input id="kat51" type="text" inputmode="decimal" placeholder="np. 10">
+    <input id="kat51" type="text" inputmode="decimal" placeholder="np. 10.00000000">
+
     <label>Kąt 2 [°]</label>
-    <input id="kat52" type="text" inputmode="decimal" placeholder="np. 5">
+    <input id="kat52" type="text" inputmode="decimal" placeholder="np. 5.00000000">
+
     <label>Luz 1 [mm]</label>
-    <input id="luz51" type="text" inputmode="decimal" placeholder="np. 1">
+    <input id="luz51" type="text" inputmode="decimal" placeholder="np. 1.00000000">
 </div>
 
 <div id="mode6" class="mode">
     <h2>Tworzenie śmietników</h2>
     <p class="mode-desc">Wyliczanie szerokości podstawy śmietnika dla zadanej geometrii.</p>
+
     <label>Kąt pochylenia [°]</label>
-    <input id="kat6" type="text" inputmode="decimal" placeholder="np. 5">
+    <input id="kat6" type="text" inputmode="decimal" placeholder="np. 5.00000000">
+
     <label>Wysokość [mm]</label>
-    <input id="h6" type="text" inputmode="decimal" placeholder="np. 7">
+    <input id="h6" type="text" inputmode="decimal" placeholder="np. 7.00000000">
+
     <label>Szerokość docelowa [mm]</label>
-    <input id="s6" type="text" inputmode="decimal" placeholder="np. 8">
+    <input id="s6" type="text" inputmode="decimal" placeholder="np. 8.00000000">
 </div>
 
 <div class="buttons">
-    <button class="primary" onclick="oblicz()">Oblicz</button>
-    <button class="secondary" onclick="wyczysc()">Wyczyść</button>
+    <button class="primary action-main" onclick="oblicz()">Oblicz</button>
+    <button class="danger action-main" onclick="wyczysc()">Wyczyść</button>
 </div>
+
 </section>
 
 <section class="panel result-panel">
     <div class="result-label">Wynik</div>
-    <div class="result">
+
+    <div class="result" onclick="kopiuj()">
         <span id="wynik">—</span>
         <span id="unit" class="unit">°</span>
     </div>
+
     <div class="buttons">
         <button class="copy" onclick="kopiuj()">Kopiuj wynik</button>
     </div>
-    <div id="details" class="details">Wybierz narzędzie i wpisz dane wejściowe.</div>
+
+    <div id="details" class="details">
+        Wybierz narzędzie i wpisz dane wejściowe.
+    </div>
 </section>
+
 </main>
+
 </div>
 
 <footer class="statusbar">
-    <div id="status" class="status-msg">Gotowy</div>
+    <div id="status" class="status-msg">Kalkulator gotowy.</div>
     <div class="shortcuts">
         <span><kbd>Enter</kbd> Oblicz</span>
         <span><kbd>Esc</kbd> Wyczyść</span>
@@ -173,9 +205,12 @@
         <span><kbd>F1-F6</kbd> Tryby</span>
     </div>
 </footer>
+
 </div>
 
-<aside id="drawer" class="drawer">
+<div id="overlay" class="overlay" onclick="zamknijPanele()"></div>
+
+<aside id="historyDrawer" class="drawer">
     <div class="drawer-header">
         <h2>Historia</h2>
         <div>
@@ -184,6 +219,54 @@
         </div>
     </div>
     <div id="history" class="history-list"></div>
+</aside>
+
+<aside id="settingsDrawer" class="drawer">
+    <div class="drawer-header">
+        <h2>Ustawienia</h2>
+        <button class="secondary" onclick="toggleUstawienia()">Zamknij</button>
+    </div>
+
+    <div class="drawer-body">
+        <div class="setting-row">
+            <div class="switch-wrap">
+                <div>
+                    <div class="setting-title">Auto kopiowanie</div>
+                    <div class="setting-desc">Po obliczeniu wynik automatycznie trafia do schowka.</div>
+                </div>
+
+                <label class="switch">
+                    <input id="autoCopyToggle" type="checkbox" onchange="ustawAutoKopiowanie(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="setting-row">
+            <div class="setting-title">Motyw</div>
+            <div class="theme-buttons">
+                <button id="themeGrayBtn" class="choice-btn active" onclick="ustawMotyw('gray')">Szary</button>
+                <button id="themeDarkBtn" class="choice-btn" onclick="ustawMotyw('dark')">Ciemny</button>
+            </div>
+        </div>
+
+        <div class="setting-row">
+            <div class="setting-title">Historia</div>
+            <div class="setting-desc">Program zapisuje ostatnie 100 wpisów.</div>
+            <div class="buttons">
+                <button class="danger" onclick="wyczyscHistorie()">Wyczyść historię</button>
+            </div>
+        </div>
+
+        <div class="setting-row">
+            <div class="setting-title">Informacje</div>
+            <div class="setting-desc">
+                Kalkulator modelarski<br>
+                v1.1<br><br>
+                © 2026 Mateusz Spyra
+            </div>
+        </div>
+    </div>
 </aside>
 
 <div id="toast" class="toast">Skopiowano</div>

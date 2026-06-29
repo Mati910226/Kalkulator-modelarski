@@ -1,4 +1,4 @@
-const CACHE_NAME = "kalkulator-modelarski-v10";
+const CACHE_NAME = "kalkulator-modelarski-v11";
 const FILES = [
   "./",
   "./index.html",

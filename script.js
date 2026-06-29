@@ -1,17 +1,25 @@
 let tryb = Number(localStorage.getItem("ostatniTrybKalkulatorModelarski")) || 1;
-let podtrybNachylenie = 1;
+let podtrybNachylenie = Number(localStorage.getItem("podtrybNachylenieKalkulatorModelarski")) || 1;
 let aktualnyWynik = "";
 let aktualnaJednostka = "°";
 let skurcz4 = 1.5;
 let kierunek4 = "pow";
-let historia = JSON.parse(localStorage.getItem("historiaKalkulatorModelarskiV10")) || [];
+let historia = JSON.parse(localStorage.getItem("historiaKalkulatorModelarskiV11")) || [];
+let autoKopiowanie = localStorage.getItem("autoKopiowanieKalkulatorModelarski") !== "false";
+let aktualnyMotyw = localStorage.getItem("motywKalkulatorModelarski") || "gray";
 
 function n(v){ return parseFloat(String(v).replace(",", ".")); }
 function deg(v){ return v * Math.PI / 180; }
 function rad(v){ return v * 180 / Math.PI; }
-function f8(v){ return v.toFixed(8); }
 
-function setStatus(t){ document.getElementById("status").textContent = t || "Gotowy"; }
+function formatResult(v) {
+    if (!isFinite(v)) return "0.00000000";
+    return Number(v).toFixed(8);
+}
+
+function setStatus(t){
+    document.getElementById("status").textContent = t || "Kalkulator gotowy.";
+}
 
 let toastTimer;
 function toast(t){
@@ -22,17 +30,45 @@ function toast(t){
     toastTimer = setTimeout(() => el.classList.remove("show"), 1300);
 }
 
-function toggleHistoria(){ document.getElementById("drawer").classList.toggle("open"); }
+function showOverlay(){ document.getElementById("overlay").classList.add("show"); }
+function hideOverlay(){ document.getElementById("overlay").classList.remove("show"); }
+
+function zamknijPanele(){
+    document.getElementById("historyDrawer").classList.remove("open");
+    document.getElementById("settingsDrawer").classList.remove("open");
+    hideOverlay();
+}
+
+function toggleHistoria(){
+    const h = document.getElementById("historyDrawer");
+    const s = document.getElementById("settingsDrawer");
+    const willOpen = !h.classList.contains("open");
+    s.classList.remove("open");
+    h.classList.toggle("open", willOpen);
+    willOpen ? showOverlay() : hideOverlay();
+}
+
+function toggleUstawienia(){
+    const h = document.getElementById("historyDrawer");
+    const s = document.getElementById("settingsDrawer");
+    const willOpen = !s.classList.contains("open");
+    h.classList.remove("open");
+    s.classList.toggle("open", willOpen);
+    willOpen ? showOverlay() : hideOverlay();
+}
 
 function zmienTryb(t){
     tryb = t;
     localStorage.setItem("ostatniTrybKalkulatorModelarski", String(t));
+
     document.querySelectorAll(".nav-btn").forEach((b,i)=>b.classList.toggle("active", i+1===t));
     document.querySelectorAll(".mode").forEach((m,i)=>m.classList.toggle("active", i+1===t));
+
     aktualnyWynik = "";
     document.getElementById("wynik").textContent = "—";
     setStatus("Zmieniono tryb.");
     updateOpis();
+
     const first = document.querySelector(".mode.active input");
     if(first) first.focus();
 }
@@ -40,6 +76,7 @@ function zmienTryb(t){
 function updateOpis(){
     const d=document.getElementById("details");
     const u=document.getElementById("unit");
+
     if(tryb===1){ u.textContent="°"; d.innerHTML="Narzędzie gotowe do obliczeń."; }
     if(tryb===2){ u.textContent="°"; d.innerHTML="Narzędzie gotowe do obliczeń."; }
     if(tryb===3){ u.textContent=podtrybNachylenie===1||podtrybNachylenie===3 ? "%" : (podtrybNachylenie===2 ? "°" : "mm"); d.innerHTML="Narzędzie gotowe do obliczeń."; }
@@ -50,6 +87,7 @@ function updateOpis(){
 
 function ustawNachylenie(t){
     podtrybNachylenie = t;
+    localStorage.setItem("podtrybNachylenieKalkulatorModelarski", String(t));
     document.querySelectorAll("#mode3 .submode").forEach((el,i)=>el.classList.toggle("active", i+1===t));
     document.querySelectorAll("#mode3 .choice-btn").forEach((el,i)=>el.classList.toggle("active", i+1===t));
     aktualnyWynik = "";
@@ -69,11 +107,13 @@ function oblicz(){
 }
 
 function setResult(wynik, jednostka, nazwa, dane, szczegoly){
-    aktualnyWynik=f8(wynik);
+    aktualnyWynik=formatResult(wynik);
     aktualnaJednostka=jednostka;
+
     document.getElementById("wynik").textContent=aktualnyWynik;
     document.getElementById("unit").textContent=jednostka;
     document.getElementById("details").innerHTML=szczegoly;
+
     historia.unshift({
         czas:new Date().toLocaleTimeString("pl-PL"),
         nazwa,
@@ -81,10 +121,17 @@ function setResult(wynik, jednostka, nazwa, dane, szczegoly){
         jednostka,
         dane
     });
-    historia=historia.slice(0,20);
+
+    historia=historia.slice(0,100);
     saveHist();
-    kopiuj();
-    setStatus("Wynik obliczony.");
+
+    if(autoKopiowanie){
+        kopiuj();
+        setStatus("Wynik obliczony i skopiowany.");
+    } else {
+        setStatus("Wynik obliczony. Auto kopiowanie jest wyłączone.");
+        toast("Wynik obliczony");
+    }
 }
 
 function blad(t){
@@ -99,8 +146,9 @@ function calc1(){
     const B=n(document.getElementById("b1").value);
     if(isNaN(A)||isNaN(B)) return blad("Podaj A i B.");
     if(B===0) return blad("B nie może być równe 0.");
+
     const w=rad(Math.atan(A/B));
-    setResult(w,"°","Arcus TG",`A=${A} mm<br>B=${B} mm`,`Dane zapisane w historii.`);
+    setResult(w,"°","Wyliczanie kąta",`A=${A} mm<br>B=${B} mm`,`Dane zapisane w historii.`);
 }
 
 function calc2(){
@@ -109,9 +157,10 @@ function calc2(){
     const B=n(document.getElementById("b2").value);
     if(isNaN(A)||isNaN(alfa)||isNaN(B)) return blad("Podaj A, α i B.");
     if(B===0) return blad("B nie może być równe 0.");
+
     const przes=A*Math.tan(deg(alfa));
     const beta=rad(Math.atan(przes/B));
-    setResult(beta,"°","Kąt β",`A=${A} mm<br>α=${alfa}°<br>B=${B} mm`,`Przesunięcie: ${f8(przes)} mm`);
+    setResult(beta,"°","Wyliczanie kąta β",`A=${A} mm<br>α=${alfa}°<br>B=${B} mm`,`Przesunięcie: ${formatResult(przes)} mm`);
 }
 
 function calc3(){
@@ -120,23 +169,23 @@ function calc3(){
         const B=n(document.getElementById("nB").value);
         if(isNaN(A)||isNaN(B)) return blad("Podaj A i B.");
         if(B===0) return blad("B nie może być równe 0.");
-        setResult((A/B)*100, "%", "Nachylenie mm → %", `A=${A} mm<br>B=${B} mm`, "Dane zapisane w historii.");
+        setResult((A/B)*100, "%", "Przelicznik nachylenia", `A=${A} mm<br>B=${B} mm`, "Dane zapisane w historii.");
     }
     if(podtrybNachylenie===2){
         const p=n(document.getElementById("nProc").value);
         if(isNaN(p)) return blad("Podaj procent.");
-        setResult(rad(Math.atan(p/100)), "°", "Nachylenie % → °", `Nachylenie=${p}%`, "Dane zapisane w historii.");
+        setResult(rad(Math.atan(p/100)), "°", "Przelicznik nachylenia", `Nachylenie=${p}%`, "Dane zapisane w historii.");
     }
     if(podtrybNachylenie===3){
         const k=n(document.getElementById("nKat").value);
         if(isNaN(k)) return blad("Podaj kąt.");
-        setResult(Math.tan(deg(k))*100, "%", "Nachylenie ° → %", `Kąt=${k}°`, "Dane zapisane w historii.");
+        setResult(Math.tan(deg(k))*100, "%", "Przelicznik nachylenia", `Kąt=${k}°`, "Dane zapisane w historii.");
     }
     if(podtrybNachylenie===4){
         const p=n(document.getElementById("nProc2").value);
         const h=n(document.getElementById("nWys").value);
         if(isNaN(p)||isNaN(h)) return blad("Podaj procent i wysokość.");
-        setResult(h*p/100, "mm", "Nachylenie % + wysokość", `Nachylenie=${p}%<br>Wysokość=${h} mm`, "Dane zapisane w historii.");
+        setResult(h*p/100, "mm", "Przelicznik nachylenia", `Nachylenie=${p}%<br>Wysokość=${h} mm`, "Dane zapisane w historii.");
     }
 }
 
@@ -163,15 +212,17 @@ function updateChoice(active, inactive){
 function calc4(){
     const w=n(document.getElementById("w4").value);
     if(isNaN(w)) return blad("Podaj wymiar.");
+
     const mnoz=1+skurcz4/100;
     const wynik=kierunek4==="pow" ? w*mnoz : w/mnoz;
     const rozn=wynik-w;
+
     setResult(
         wynik,
         "mm",
-        "Skurcz",
+        "Kalkulator skurczu",
         `Wymiar=${w} mm<br>Skurcz=${skurcz4}%<br>Kierunek=${kierunek4==="pow"?"powiększ":"pomniejsz"}`,
-        `Skurcz: ${skurcz4}%<br>Różnica: ${rozn>=0?"+":""}${f8(rozn)} mm`
+        `Skurcz: ${skurcz4}%<br>Różnica: ${rozn>=0?"+":""}${formatResult(rozn)} mm`
     );
 }
 
@@ -180,7 +231,9 @@ function calc5(){
     const k2=n(document.getElementById("kat52").value);
     const l1=n(document.getElementById("luz51").value);
     if(isNaN(k1)||isNaN(k2)||isNaN(l1)) return blad("Podaj kąt 1, kąt 2 i luz.");
+
     const wynik=l1*Math.cos(deg(k2))/Math.cos(deg(k1));
+
     setResult(
         wynik,
         "mm",
@@ -195,14 +248,16 @@ function calc6(){
     const h=n(document.getElementById("h6").value);
     const s=n(document.getElementById("s6").value);
     if(isNaN(k)||isNaN(h)||isNaN(s)) return blad("Podaj kąt, wysokość i szerokość.");
+
     const przyrost=h*Math.tan(deg(k));
     const wynik=s+przyrost;
+
     setResult(
         wynik,
         "mm",
         "Tworzenie śmietników",
         `Kąt=${k}°<br>Wysokość=${h} mm<br>Szerokość=${s} mm`,
-        `Przyrost: ${f8(przyrost)} mm`
+        `Przyrost: ${formatResult(przyrost)} mm`
     );
 }
 
@@ -229,6 +284,7 @@ function fallbackCopy(t){
     document.body.appendChild(area);
     area.focus();
     area.select();
+
     try {
         document.execCommand("copy");
         setStatus("Skopiowano: " + t);
@@ -237,6 +293,7 @@ function fallbackCopy(t){
         setStatus("Nie udało się skopiować.");
         toast("Nie udało się skopiować.");
     }
+
     document.body.removeChild(area);
 }
 
@@ -250,17 +307,19 @@ function wyczysc(){
 }
 
 function saveHist(){
-    localStorage.setItem("historiaKalkulatorModelarskiV10", JSON.stringify(historia));
+    localStorage.setItem("historiaKalkulatorModelarskiV11", JSON.stringify(historia));
     renderHist();
 }
 
 function renderHist(){
     const box=document.getElementById("history");
     box.innerHTML="";
+
     if(historia.length===0){
         box.innerHTML='<div class="small-note">Brak historii.</div>';
         return;
     }
+
     historia.forEach((h,i)=>{
         const div=document.createElement("div");
         div.className="history-item";
@@ -300,10 +359,46 @@ function wyczyscHistorie(){
     toast("Historia wyczyszczona");
 }
 
+function ustawAutoKopiowanie(wartosc){
+    autoKopiowanie = wartosc;
+    localStorage.setItem("autoKopiowanieKalkulatorModelarski", String(wartosc));
+    setStatus(wartosc ? "Auto kopiowanie włączone." : "Auto kopiowanie wyłączone.");
+    toast(wartosc ? "Auto kopiowanie ON" : "Auto kopiowanie OFF");
+}
+
+function ustawMotyw(motyw){
+    aktualnyMotyw = motyw;
+    localStorage.setItem("motywKalkulatorModelarski", motyw);
+    document.body.classList.toggle("theme-dark", motyw === "dark");
+    document.getElementById("themeGrayBtn").classList.toggle("active", motyw === "gray");
+    document.getElementById("themeDarkBtn").classList.toggle("active", motyw === "dark");
+    setStatus(motyw === "dark" ? "Motyw ciemny." : "Motyw szary.");
+}
+
+function init(){
+    const auto = document.getElementById("autoCopyToggle");
+    auto.checked = autoKopiowanie;
+    ustawMotyw(aktualnyMotyw);
+    ustawNachylenie(podtrybNachylenie);
+    zmienTryb(tryb);
+    renderHist();
+}
+
 document.addEventListener("keydown", e=>{
-    if(e.key==="Enter") { e.preventDefault(); oblicz(); }
-    if(e.key==="Escape") { e.preventDefault(); wyczysc(); }
-    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="c" && aktualnyWynik) { kopiuj(); }
+    if(e.key==="Enter") {
+        e.preventDefault();
+        oblicz();
+    }
+
+    if(e.key==="Escape") {
+        e.preventDefault();
+        wyczysc();
+    }
+
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="c" && aktualnyWynik) {
+        kopiuj();
+    }
+
     if(e.key==="F1"){ e.preventDefault(); zmienTryb(1); }
     if(e.key==="F2"){ e.preventDefault(); zmienTryb(2); }
     if(e.key==="F3"){ e.preventDefault(); zmienTryb(3); }
@@ -320,6 +415,4 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
     navigator.serviceWorker.register("sw.js").catch(()=>{});
 }
 
-ustawNachylenie(1);
-zmienTryb(tryb);
-renderHist();
+init();
