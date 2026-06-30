@@ -1,30 +1,30 @@
-let tryb = Number(localStorage.getItem("ostatniTrybKalkulatorModelarski")) || 1;
-let podtrybNachylenie = Number(localStorage.getItem("podtrybNachylenieKalkulatorModelarski")) || 1;
-let aktualnyWynik = "";
+let tryb = 1;
+let podtrybNachylenie = 1;
+let aktualnyWynik = "0.00000000";
 let aktualnaJednostka = "°";
-let skurcz4 = 1.5;
+let skurcz4 = 1;
 let kierunek4 = "pow";
-let historia = JSON.parse(localStorage.getItem("historiaKalkulatorModelarskiV11Web")) || [];
-let autoKopiowanie = localStorage.getItem("autoKopiowanieKalkulatorModelarski") !== "false";
-let aktualnyMotyw = localStorage.getItem("motywKalkulatorModelarski") || "dark";
+let historia = [];
+let autoKopiowanie = true;
+let aktualnyMotyw = "dark";
 
 function n(v){ return parseFloat(String(v).replace(",", ".")); }
 function deg(v){ return v * Math.PI / 180; }
 function rad(v){ return v * 180 / Math.PI; }
 
-function formatResult(v) {
-    if (!isFinite(v)) return "0.00000000";
-    return Number(v).toFixed(8);
+function format8(value) {
+    if (!isFinite(value)) return "0.00000000";
+    return Number(value).toFixed(8);
 }
 
-function setStatus(t){
-    document.getElementById("status").textContent = t || "Kalkulator gotowy.";
+function setStatus(text) {
+    document.getElementById("status").textContent = text || "Kalkulator gotowy.";
 }
 
 let toastTimer;
-function toast(t){
+function toast(text) {
     const el = document.getElementById("toast");
-    el.textContent = t;
+    el.textContent = text;
     el.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove("show"), 1300);
@@ -59,13 +59,10 @@ function toggleUstawienia(){
 
 function zmienTryb(t){
     tryb = t;
-    localStorage.setItem("ostatniTrybKalkulatorModelarski", String(t));
-
     document.querySelectorAll(".nav-btn").forEach((b,i)=>b.classList.toggle("active", i+1===t));
     document.querySelectorAll(".mode").forEach((m,i)=>m.classList.toggle("active", i+1===t));
-
-    aktualnyWynik = "";
-    document.getElementById("wynik").textContent = "—";
+    aktualnyWynik = "0.00000000";
+    document.getElementById("wynik").textContent = "0.00000000";
     setStatus("Zmieniono tryb.");
     updateOpis();
 
@@ -87,11 +84,10 @@ function updateOpis(){
 
 function ustawNachylenie(t){
     podtrybNachylenie = t;
-    localStorage.setItem("podtrybNachylenieKalkulatorModelarski", String(t));
     document.querySelectorAll("#mode3 .submode").forEach((el,i)=>el.classList.toggle("active", i+1===t));
     document.querySelectorAll("#mode3 .choice-btn").forEach((el,i)=>el.classList.toggle("active", i+1===t));
-    aktualnyWynik = "";
-    document.getElementById("wynik").textContent = "—";
+    aktualnyWynik = "0.00000000";
+    document.getElementById("wynik").textContent = "0.00000000";
     updateOpis();
     const first = document.querySelector("#mode3 .submode.active input");
     if(first) first.focus();
@@ -106,49 +102,55 @@ function oblicz(){
     if(tryb===6) calc6();
 }
 
-function setResult(wynik, jednostka, nazwa, dane, szczegoly){
-    aktualnyWynik=formatResult(wynik);
-    aktualnaJednostka=jednostka;
 
-    document.getElementById("wynik").textContent=aktualnyWynik;
-    document.getElementById("unit").textContent=jednostka;
-    document.getElementById("details").innerHTML=szczegoly;
+function flashResult(){
+    const box = document.querySelector(".result");
+    if(!box) return;
+    box.classList.remove("flash");
+    void box.offsetWidth;
+    box.classList.add("flash");
+}
+
+function setResult(value, unit, name, data, details){
+    aktualnyWynik = format8(value);
+    aktualnaJednostka = unit;
+    document.getElementById("wynik").textContent = aktualnyWynik;
+    document.getElementById("unit").textContent = unit;
+    document.getElementById("details").innerHTML = "Dane zapisane w historii.";
+    flashResult();
 
     historia.unshift({
-        czas:new Date().toLocaleTimeString("pl-PL"),
-        nazwa,
-        wynik:aktualnyWynik,
-        jednostka,
-        dane
+        czas: new Date().toLocaleTimeString("pl-PL"),
+        nazwa: name,
+        wynik: aktualnyWynik,
+        jednostka: unit,
+        dane: data
     });
 
-    historia=historia.slice(0,100);
-    saveHist();
+    historia = historia.slice(0, 100);
+    renderHist();
 
     if(autoKopiowanie){
         kopiuj();
         setStatus("Wynik obliczony i skopiowany.");
     } else {
-        setStatus("Wynik obliczony. Auto kopiowanie jest wyłączone.");
+        setStatus("Wynik obliczony.");
         toast("Wynik obliczony");
     }
 }
 
-function blad(t){
-    aktualnyWynik="";
-    document.getElementById("wynik").textContent="—";
-    setStatus(t);
-    toast(t);
+function blad(text){
+    setStatus(text);
+    document.getElementById("details").innerHTML = text;
+    toast(text);
 }
 
 function calc1(){
-    const A=n(document.getElementById("a1").value);
-    const B=n(document.getElementById("b1").value);
+    const A = n(document.getElementById("a1").value);
+    const B = n(document.getElementById("b1").value);
     if(isNaN(A)||isNaN(B)) return blad("Podaj A i B.");
     if(B===0) return blad("B nie może być równe 0.");
-
-    const w=rad(Math.atan(A/B));
-    setResult(w,"°","Wyliczanie kąta",`A=${A} mm<br>B=${B} mm`,`Dane zapisane w historii.`);
+    setResult(rad(Math.atan(A/B)), "°", "Wyliczanie kąta", `A=${A} mm<br>B=${B} mm`, "Dane zapisane w historii.");
 }
 
 function calc2(){
@@ -157,10 +159,9 @@ function calc2(){
     const B=n(document.getElementById("b2").value);
     if(isNaN(A)||isNaN(alfa)||isNaN(B)) return blad("Podaj A, α i B.");
     if(B===0) return blad("B nie może być równe 0.");
-
     const przes=A*Math.tan(deg(alfa));
     const beta=rad(Math.atan(przes/B));
-    setResult(beta,"°","Wyliczanie kąta β",`A=${A} mm<br>α=${alfa}°<br>B=${B} mm`,`Przesunięcie: ${formatResult(przes)} mm`);
+    setResult(beta, "°", "Wyliczanie kąta β", `A=${A} mm<br>α=${alfa}°<br>B=${B} mm`, `Przesunięcie: ${format8(przes)} mm`);
 }
 
 function calc3(){
@@ -171,16 +172,19 @@ function calc3(){
         if(B===0) return blad("B nie może być równe 0.");
         setResult((A/B)*100, "%", "Przelicznik nachylenia", `A=${A} mm<br>B=${B} mm`, "Dane zapisane w historii.");
     }
+
     if(podtrybNachylenie===2){
         const p=n(document.getElementById("nProc").value);
         if(isNaN(p)) return blad("Podaj procent.");
         setResult(rad(Math.atan(p/100)), "°", "Przelicznik nachylenia", `Nachylenie=${p}%`, "Dane zapisane w historii.");
     }
+
     if(podtrybNachylenie===3){
         const k=n(document.getElementById("nKat").value);
         if(isNaN(k)) return blad("Podaj kąt.");
         setResult(Math.tan(deg(k))*100, "%", "Przelicznik nachylenia", `Kąt=${k}°`, "Dane zapisane w historii.");
     }
+
     if(podtrybNachylenie===4){
         const p=n(document.getElementById("nProc2").value);
         const h=n(document.getElementById("nWys").value);
@@ -212,18 +216,10 @@ function updateChoice(active, inactive){
 function calc4(){
     const w=n(document.getElementById("w4").value);
     if(isNaN(w)) return blad("Podaj wymiar.");
-
-    const mnoz=1+skurcz4/100;
-    const wynik=kierunek4==="pow" ? w*mnoz : w/mnoz;
-    const rozn=wynik-w;
-
-    setResult(
-        wynik,
-        "mm",
-        "Kalkulator skurczu",
-        `Wymiar=${w} mm<br>Skurcz=${skurcz4}%<br>Kierunek=${kierunek4==="pow"?"powiększ":"pomniejsz"}`,
-        `Skurcz: ${skurcz4}%<br>Różnica: ${rozn>=0?"+":""}${formatResult(rozn)} mm`
-    );
+    const factor=1+skurcz4/100;
+    const result=kierunek4==="pow" ? w*factor : w/factor;
+    const diff=result-w;
+    setResult(result, "mm", "Kalkulator skurczu", `Wymiar=${w} mm<br>Skurcz=${skurcz4}%<br>Kierunek=${kierunek4==="pow"?"powiększ":"pomniejsz"}`, `Skurcz: ${skurcz4}%<br>Różnica: ${diff>=0?"+":""}${format8(diff)} mm`);
 }
 
 function calc5(){
@@ -231,16 +227,8 @@ function calc5(){
     const k2=n(document.getElementById("kat52").value);
     const l1=n(document.getElementById("luz51").value);
     if(isNaN(k1)||isNaN(k2)||isNaN(l1)) return blad("Podaj kąt 1, kąt 2 i luz.");
-
-    const wynik=l1*Math.cos(deg(k2))/Math.cos(deg(k1));
-
-    setResult(
-        wynik,
-        "mm",
-        "Luzy znaków rdzeniowych",
-        `Kąt 1=${k1}°<br>Kąt 2=${k2}°<br>Luz 1=${l1} mm`,
-        `Dane zapisane w historii.`
-    );
+    const result=l1*Math.cos(deg(k2))/Math.cos(deg(k1));
+    setResult(result, "mm", "Luzy znaków rdzeniowych", `Kąt 1=${k1}°<br>Kąt 2=${k2}°<br>Luz 1=${l1} mm`, "Dane zapisane w historii.");
 }
 
 function calc6(){
@@ -248,17 +236,9 @@ function calc6(){
     const h=n(document.getElementById("h6").value);
     const s=n(document.getElementById("s6").value);
     if(isNaN(k)||isNaN(h)||isNaN(s)) return blad("Podaj kąt, wysokość i szerokość.");
-
     const przyrost=h*Math.tan(deg(k));
-    const wynik=s+przyrost;
-
-    setResult(
-        wynik,
-        "mm",
-        "Tworzenie śmietników",
-        `Kąt=${k}°<br>Wysokość=${h} mm<br>Szerokość=${s} mm`,
-        `Przyrost: ${formatResult(przyrost)} mm`
-    );
+    const result=s+przyrost;
+    setResult(result, "mm", "Tworzenie śmietników", `Kąt=${k}°<br>Wysokość=${h} mm<br>Szerokość=${s} mm`, `Przyrost: ${format8(przyrost)} mm`);
 }
 
 function kopiuj(){
@@ -266,19 +246,19 @@ function kopiuj(){
     kopiujTekst(aktualnyWynik);
 }
 
-function kopiujTekst(t){
+function kopiujTekst(text){
     if(navigator.clipboard && window.isSecureContext){
-        navigator.clipboard.writeText(t)
-            .then(()=>{ setStatus("Skopiowano: " + t); toast("Skopiowano " + t); })
-            .catch(()=>fallbackCopy(t));
+        navigator.clipboard.writeText(text)
+            .then(()=>{ setStatus("Skopiowano: " + text); toast("Skopiowano " + text); })
+            .catch(()=>fallbackCopy(text));
     } else {
-        fallbackCopy(t);
+        fallbackCopy(text);
     }
 }
 
-function fallbackCopy(t){
+function fallbackCopy(text){
     const area=document.createElement("textarea");
-    area.value=t;
+    area.value=text;
     area.style.position="fixed";
     area.style.left="-9999px";
     document.body.appendChild(area);
@@ -287,8 +267,9 @@ function fallbackCopy(t){
 
     try {
         document.execCommand("copy");
-        setStatus("Skopiowano: " + t);
-        toast("Skopiowano " + t);
+        setStatus("Skopiowano: " + text);
+        document.getElementById("details").innerHTML = "Wynik skopiowany do schowka.";
+        toast("Skopiowano " + text);
     } catch {
         setStatus("Nie udało się skopiować.");
         toast("Nie udało się skopiować.");
@@ -299,16 +280,12 @@ function fallbackCopy(t){
 
 function wyczysc(){
     document.querySelectorAll(".mode.active input").forEach(i=>i.value="");
-    aktualnyWynik="";
-    document.getElementById("wynik").textContent="—";
+    aktualnyWynik="0.00000000";
+    document.getElementById("wynik").textContent="0.00000000";
     setStatus("Wyczyszczono.");
-    const first = document.querySelector(".mode.active input");
+    document.getElementById("details").innerHTML = "Wszystkie pola zostały wyczyszczone.";
+    const first=document.querySelector(".mode.active input");
     if(first) first.focus();
-}
-
-function saveHist(){
-    localStorage.setItem("historiaKalkulatorModelarskiV11Web", JSON.stringify(historia));
-    renderHist();
 }
 
 function renderHist(){
@@ -316,7 +293,7 @@ function renderHist(){
     box.innerHTML="";
 
     if(historia.length===0){
-        box.innerHTML='<div class="small-note">Brak historii.</div>';
+        box.innerHTML='<div class="history-data">Brak historii.</div>';
         return;
     }
 
@@ -325,10 +302,7 @@ function renderHist(){
         div.className="history-item";
         div.innerHTML=`
             <div class="history-result">${h.wynik} ${h.jednostka}</div>
-            <div class="history-data">
-                ${h.czas} — ${h.nazwa}<br>
-                ${h.dane}
-            </div>
+            <div class="history-data">${h.czas} — ${h.nazwa}<br>${h.dane}</div>
             <div class="history-buttons">
                 <button class="copy" onclick="kopiujHistorie(${i})">Kopiuj</button>
                 <button class="danger" onclick="usunHistorie(${i})">Usuń</button>
@@ -347,41 +321,30 @@ function kopiujHistorie(i){
 
 function usunHistorie(i){
     historia.splice(i,1);
-    saveHist();
+    renderHist();
     setStatus("Wpis historii usunięty.");
     toast("Wpis usunięty");
 }
 
 function wyczyscHistorie(){
     historia=[];
-    saveHist();
+    renderHist();
     setStatus("Historia wyczyszczona.");
     toast("Historia wyczyszczona");
 }
 
-function ustawAutoKopiowanie(wartosc){
-    autoKopiowanie = wartosc;
-    localStorage.setItem("autoKopiowanieKalkulatorModelarski", String(wartosc));
-    setStatus(wartosc ? "Auto kopiowanie włączone." : "Auto kopiowanie wyłączone.");
-    toast(wartosc ? "Auto kopiowanie ON" : "Auto kopiowanie OFF");
+function ustawAutoKopiowanie(value){
+    autoKopiowanie=value;
+    setStatus(value ? "Auto kopiowanie włączone." : "Auto kopiowanie wyłączone.");
+    toast(value ? "Auto kopiowanie ON" : "Auto kopiowanie OFF");
 }
 
-function ustawMotyw(motyw){
-    aktualnyMotyw = motyw;
-    localStorage.setItem("motywKalkulatorModelarski", motyw);
-    document.body.classList.toggle("theme-gray", motyw === "gray");
-    document.getElementById("themeGrayBtn").classList.toggle("active", motyw === "gray");
-    document.getElementById("themeDarkBtn").classList.toggle("active", motyw === "dark");
-    setStatus(motyw === "dark" ? "Motyw ciemny." : "Motyw szary.");
-}
-
-function init(){
-    const auto = document.getElementById("autoCopyToggle");
-    auto.checked = autoKopiowanie;
-    ustawMotyw(aktualnyMotyw);
-    ustawNachylenie(podtrybNachylenie);
-    zmienTryb(tryb);
-    renderHist();
+function ustawMotyw(theme){
+    aktualnyMotyw=theme;
+    document.body.classList.toggle("theme-gray", theme==="gray");
+    document.getElementById("themeDarkBtn").classList.toggle("active", theme==="dark");
+    document.getElementById("themeGrayBtn").classList.toggle("active", theme==="gray");
+    setStatus(theme==="dark" ? "Motyw ciemny." : "Motyw szary.");
 }
 
 document.addEventListener("keydown", e=>{
@@ -407,12 +370,18 @@ document.addEventListener("keydown", e=>{
     if(e.key==="F6"){ e.preventDefault(); zmienTryb(6); }
 });
 
-document.querySelectorAll("input").forEach(i=>{
-    i.addEventListener("focus", function(){ this.select(); });
+document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("focus", function() {
+        this.select();
+    });
 });
 
-if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-    navigator.serviceWorker.register("sw.js").catch(()=>{});
-}
+document.getElementById("autoCopyToggle").checked = true;
+ustawMotyw("dark");
+ustawNachylenie(1);
+zmienTryb(1);
+renderHist();
 
-init();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+}
