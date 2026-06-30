@@ -4,9 +4,9 @@ let aktualnyWynik = "";
 let aktualnaJednostka = "°";
 let skurcz4 = 1.5;
 let kierunek4 = "pow";
-let historia = JSON.parse(localStorage.getItem("historiaKalkulatorModelarskiV11")) || [];
+let historia = JSON.parse(localStorage.getItem("historiaKalkulatorModelarskiV11Web")) || [];
 let autoKopiowanie = localStorage.getItem("autoKopiowanieKalkulatorModelarski") !== "false";
-let aktualnyMotyw = localStorage.getItem("motywKalkulatorModelarski") || "gray";
+let aktualnyMotyw = localStorage.getItem("motywKalkulatorModelarski") || "dark";
 
 function n(v){ return parseFloat(String(v).replace(",", ".")); }
 function deg(v){ return v * Math.PI / 180; }
@@ -307,7 +307,7 @@ function wyczysc(){
 }
 
 function saveHist(){
-    localStorage.setItem("historiaKalkulatorModelarskiV11", JSON.stringify(historia));
+    localStorage.setItem("historiaKalkulatorModelarskiV11Web", JSON.stringify(historia));
     renderHist();
 }
 
@@ -369,7 +369,7 @@ function ustawAutoKopiowanie(wartosc){
 function ustawMotyw(motyw){
     aktualnyMotyw = motyw;
     localStorage.setItem("motywKalkulatorModelarski", motyw);
-    document.body.classList.toggle("theme-dark", motyw === "dark");
+    document.body.classList.toggle("theme-gray", motyw === "gray");
     document.getElementById("themeGrayBtn").classList.toggle("active", motyw === "gray");
     document.getElementById("themeDarkBtn").classList.toggle("active", motyw === "dark");
     setStatus(motyw === "dark" ? "Motyw ciemny." : "Motyw szary.");

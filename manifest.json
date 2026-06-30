@@ -4,8 +4,8 @@
   "description": "Narzędzia obliczeniowe dla modelarni.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#d7dbe2",
-  "theme_color": "#c9ced6",
+  "background_color": "#151b24",
+  "theme_color": "#0f1722",
   "icons": [
     {
       "src": "icons/icon-192.png",

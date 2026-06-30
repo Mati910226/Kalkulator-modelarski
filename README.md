@@ -32,3 +32,11 @@ Gotowy projekt do wrzucenia na GitHub Pages.
 - motyw szary jako domyślny,
 - motyw ciemny opcjonalny,
 - logo w ikonach aplikacji.
+
+
+## v1.1 web
+
+- Domyślny motyw: ciemny.
+- Wynik zawsze ma 8 miejsc po przecinku.
+- Logo w nagłówku jest zaszyte w index.html jako base64.
+- Przyciski Oblicz/Wyczyść są szerokie i w jednej linii.
